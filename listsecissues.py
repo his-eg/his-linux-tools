@@ -31,8 +31,11 @@ class SecurityIssueLister:
         sys.stderr.write("Download list of known security issue from Ubuntu\n")
         self.known_issues = ""
         self.download("/~ubuntu-security/cve/main.html")
+        sys.stderr.write("    1/3\n")
         self.download("/~ubuntu-security/cve/universe.html")
+        sys.stderr.write("    2/3\n")
         self.download("/~ubuntu-security/cve/partner.html")
+        sys.stderr.write("    3/3\n")
 
 
     def download(self, url):
@@ -103,7 +106,9 @@ class SecurityIssueLister:
 
         sys.stderr.write("Generating output\n")
         print("<!DOCTYPE html><html><head><base href=\"https://people.canonical.com/~ubuntu-security/cve/\"><title>Security Issues</title>");
-        print("<link rel=\"StyleSheet\" href=\"toplevel.css\" type=\"text/css\" /></head><body><table>")
+        print("<link rel=\"StyleSheet\" href=\"toplevel.css\" type=\"text/css\" /></head><body>")
+        print("<h1>Filtered Security Report</h1>")
+        print("<p>* supported by Canonical Ltd, <a href=\"https://people.canonical.com/~ubuntu-security/cve/priority.html\">Color codes</a><br><table>")
         print(self.table_header)
 
 
