@@ -68,37 +68,18 @@ class SecurityIssueLister:
         """Gets a list of all installed packages"""
 
         sys.stderr.write("Looking up installed packages\n")
-        process = subprocess.Popen(["dpkg", "--get-selections"], stderr=DEVNULL, stdout=subprocess.PIPE)
-        stdout = process.communicate()[0]
-        packages = []
-        for row in stdout.splitlines():
-            found = re.search('^([^:\t]*)', row).group(1)
-            packages.append(found)
-        self.packages = packages
-        process.wait()
 
-
-    def lookup_all_source_packages(self):
-        """Get a list of the source package names for the installed packages"""
-
-        ## TODO: Is there a better way to get the list without invoking one process per package?
-        sys.stderr.write("Looking up name of source packages\n")
         sources = set()
-        c = len(self.packages)
-        i = 0
-        for package in self.packages:
-            i = i + 1
-            if i % 100 == 0:
-                sys.stderr.write("   " + str(i) + "/" + str(c) + "\n")
-            process = subprocess.Popen(["apt-cache", "show", package], stderr=DEVNULL, stdout=subprocess.PIPE)
-            stdout = process.communicate()[0]
-            packages = []
-            for row in stdout.splitlines():
-                matcher = re.search('^Source: (.*)', row)
+        filename = "/var/lib/dpkg/status"
+        if len(sys.argv) > 1:
+           filename = sys.argv[1]
+
+        with open(filename) as f:
+            for line in f:
+                matcher = re.search('^Source: (.*)', line)
                 if matcher:
                     sources.add(matcher.group(1))
         self.sources = sources
-        process.wait()
 
 
     def output_header(self):
@@ -123,10 +104,11 @@ class SecurityIssueLister:
 
 
     def process(self):
+        """Does everything"""
+
         self.get_security_issues_from_website()
         self.parse_known_issues()
         self.discover_installed_packages()
-        self.lookup_all_source_packages()
         self.output_header()
         self.output_result()
         sys.stderr.write("Done\n")
