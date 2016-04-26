@@ -3,13 +3,7 @@
 import httplib
 import os
 import re
-import subprocess
 import sys
-
-try:
-    from subprocess import DEVNULL # py3k
-except ImportError:
-    DEVNULL = open(os.devnull, 'wb')
 
 
 # http://stackoverflow.com/a/22272587
@@ -22,7 +16,7 @@ class Multimap(dict):
 
 
 
-class SecurityIssueLister:
+class SecurityIssueLister(object):
 
 
     def get_security_issues_from_website(self):
